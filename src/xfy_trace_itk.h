@@ -1,79 +1,95 @@
+#ifndef XFY_TRACE_ITK_H
+#define XFY_TRACE_ITK_H
+
 #include <stdio.h>
 
-#include "EXSOFY/XFY_TRACE.h"
+#include "xfy/trace/xfy_trace.h"
 
 #ifdef XFY_TRACE_NOT_ACTIVE
 
 // Non trace expansion
-#define XFY_TRACE_MSG
-#define XFY_TRACE_FCE(FceName)
-#define XFY_TRACE_RETURN(r) return r
-#define XFY_TRACE_ERROR(r) return r
+#define XFY_TMSG
+#define XFY_TFCE()
+#define XFY_TFCE_P0()
+#define XFY_TFCE_P1(p1,o1)
+#define XFY_TRET(r) return r
+#define XFY_TERR(r) return r
 
-#define XFY_TRACE_PARAM_1(p1,o1)
-#define XFY_TRACE_PARAM_2(p1,o1,p2,o2)
-#define XFY_TRACE_PARAM_4(p1,o1,p2,o2,p3,o3,p4,o4)
-#define XFY_TRACE_PARAM_9(p1,o1,p2,o2,p3,o3,p4,o4,p5,o5,p6,o6,p7,o7,p8,o8,p9,o9)
+
+#define XFY_TPAR_1(p1,o1)
+#define XFY_TPAR_2(p1,o1,p2,o2)
+#define XFY_TPAR_4(p1,o1,p2,o2,p3,o3,p4,o4)
+#define XFY_TPAR_9(p1,o1,p2,o2,p3,o3,p4,o4,p5,o5,p6,o6,p7,o7,p8,o8,p9,o9)
 
 #define XFY_TRACE_MSG(a,b,c)
 
 //#define XFY_CALL_RNZ(f) { int xfy0O0O0O = XFY_CALL ( f ); if ( xfy0O0O0O != 0 ) { printf ( "%d:%s\n", xfy0O0O0O, #f ); XFY_TRACE_RETURN ( xfy0O0O0O ); } }
 //#define XFY_CALL_RNZ(f) { int xfy0O0O0O = XFY_CALL ( f ); if ( xfy0O0O0O != 0 ) XFY_XFY_TRACE_RETURN ( xfy0O0O0O ); }
 
-#define XFY_CALL(f) f
-
-#define XFY_CALL_EX(f) { int xfy0O0O0O = XFY_CALL ( f ); if ( xfy0O0O0O != 0 ) { printf ( "%d:%s\n", xfy0O0O0O, #f ); } }
-
+#define XFY_TCALL(f) f
 
 #else
 
-#define XFY_TRACE_MSG g_cXFYTrace.putMessage
-#define XFY_TRACE_FCE(FceName) CXFYTraceFce cXFYTraceFce(#FceName)
+#ifdef _WIN32
+#ifndef __func__
+#define __func__ __FUNCTION__
+#endif
+#endif
 
-#define XFY_TRACE_RETURN(RetValue) return (g_cXFYTrace.putFceReturns(RetValue,&cXFYTraceFce))
-#define XFY_TRACE_ERROR(RetValue) return(g_cXFYTrace.putErrorReturns(RetValue,&cXFYTraceFce))
+#define XFY_TMSG XFY::g_XFYTrace.putMessage
+#define XFY_TRET(RetValue) return (XFY::g_XFYTrace.putFceReturns(RetValue,&cXFYTraceFce))
+#define XFY_TERR(RetValue) return(XFY::g_XFYTrace.putErrorReturns(RetValue,&cXFYTraceFce))
 
-#define XFY_TRACE_PARAM_P(P,T) g_cXFYTrace.putVariable(#P,P,CXFYTrace::eVT_##T,&cXFYTraceFce)
-#define XFY_TRACE_PARAM_0() if ( g_cXFYTrace.showParam() ) { g_cXFYTrace.finishFunctionHeader(); }
-#define XFY_TRACE_PARAM_F(P1,T1) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); }
-#define XFY_TRACE_PARAM_1(P1,T1) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); g_cXFYTrace.finishFunctionHeader(); }
-#define XFY_TRACE_PARAM_2(P1,T1,P2,T2) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); g_cXFYTrace.finishFunctionHeader();}
-#define XFY_TRACE_PARAM_3(P1,T1,P2,T2,P3,T3) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); XFY_TRACE_PARAM_P(P3,T3); g_cXFYTrace.finishFunctionHeader();}
-#define XFY_TRACE_PARAM_4(P1,T1,P2,T2,P3,T3,P4,T4) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); XFY_TRACE_PARAM_P(P3,T3);  XFY_TRACE_PARAM_P(P4,T4); g_cXFYTrace.finishFunctionHeader();} 
-#define XFY_TRACE_PARAM_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); XFY_TRACE_PARAM_P(P3,T3); \
-                                                                                      XFY_TRACE_PARAM_P(P4,T4); XFY_TRACE_PARAM_P(P5,T5); g_cXFYTrace.finishFunctionHeader();}
-#define XFY_TRACE_PARAM_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); XFY_TRACE_PARAM_P(P3,T3); \
-                                                                                      XFY_TRACE_PARAM_P(P4,T4); XFY_TRACE_PARAM_P(P5,T5); XFY_TRACE_PARAM_P(P6,T6); g_cXFYTrace.finishFunctionHeader();}
-#define XFY_TRACE_PARAM_7(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6,P7,T7) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); XFY_TRACE_PARAM_P(P3,T3); \
-                                                                                      XFY_TRACE_PARAM_P(P4,T4); XFY_TRACE_PARAM_P(P5,T5); XFY_TRACE_PARAM_P(P6,T6); XFY_TRACE_PARAM_P(P7,T7); g_cXFYTrace.finishFunctionHeader();}
-#define XFY_TRACE_PARAM_8(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6,P7,T7,P8,T8) if ( g_cXFYTrace.showParam() ) { XFY_TRACE_PARAM_P(P1,T1); XFY_TRACE_PARAM_P(P2,T2); XFY_TRACE_PARAM_P(P3,T3); \
-                                                                                      XFY_TRACE_PARAM_P(P4,T4); XFY_TRACE_PARAM_P(P5,T5); XFY_TRACE_PARAM_P(P6,T6); XFY_TRACE_PARAM_P(P7,T7); XFY_TRACE_PARAM_P(P8,T8); g_cXFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_REPORT(P,T) XFY::g_XFYTrace.putVariable(#P,P,XFY::Trace::eVT_##T,&cXFYTraceFce)
+#define XFY_TPAR(P1,T1) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); }
+#define XFY_TPAR_0() if ( XFY::g_XFYTrace.showParam() ) { XFY::g_XFYTrace.finishFunctionHeader(); }
+#define XFY_TPAR_1(P1,T1) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY::g_XFYTrace.finishFunctionHeader(); }
+#define XFY_TPAR_2(P1,T1,P2,T2) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_3(P1,T1,P2,T2,P3,T3) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); XFY::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_4(P1,T1,P2,T2,P3,T3,P4,T4) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3);  XFY_TPAR_REPORT(P4,T4); XFY::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); \
+                                                                                      XFY_TPAR_REPORT(P4,T4); XFY_TPAR_REPORT(P5,T5); XFY::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); \
+                                                                                      XFY_TPAR_REPORT(P4,T4); XFY_TPAR_REPORT(P5,T5); XFY_TPAR_REPORT(P6,T6); XFY::g_XFYTrace.finishFunctionHeader();}
 
-#define XFY_CALL(X) (g_cXFYTrace.reportFceCall(#X, __FILE__, __LINE__, (X)))
+#define XFY_TFCE XFY::TraceFce cXFYTraceFce(__func__)
+#define XFY_TFCE_NAME(X) XFY::TraceFce cXFYTraceFce(#X)
+#define XFY_TFCE_P0() XFY_TFCE; XFY_TPAR_0();
+#define XFY_TFCE_P1(P1,T1) XFY_TFCE; XFY_TPAR_1(P1,T1)
+#define XFY_TFCE_P2(P1,T1,P2,T2) XFY_TFCE; XFY_TPAR_2(P1,T1,P2,T2)
+#define XFY_TFCE_P3(P1,T1,P2,T2,P3,T3) XFY_TFCE; XFY_TPAR_3(P1,T1,P2,T2,P3,T3)
+#define XFY_TFCE_P4(P1,T1,P2,T2,P3,T3,P4,T4) XFY_TFCE; XFY_TPAR_4(P1,T1,P2,T2,P3,T3,P4,T4)
+#define XFY_TFCE_P5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) XFY_TFCE; XFY_TPAR_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5)
+#define XFY_TFCE_P6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) XFY_TFCE XFY_TPAR_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6)
 
-#define XFY_CALL_EX(f) { int xfy0O0O0O = XFY_CALL ( f ); if ( xfy0O0O0O != 0 ) { printf ( "%d:%s\n", xfy0O0O0O, #f ); } }
-
+#define XFY_TCALL_RET(X) (XFY::g_XFYTrace.reportFceCall(#X, __FILE__, __LINE__, (X)))
 #endif
 
 // Independent calls, used by trace and notrace
 #ifdef __cplusplus
-#define XFY_CALL_RNZ(X) { int rc0O0O0O = XFY_CALL ( X ); if ( rc0O0O0O != 0 ) XFY_TRACE_RETURN ( rc0O0O0O ); }
-#define CALL_RNZ(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRACE_RETURN ( rc0O0O0O ); }
-#define XFY_CALL_RNZ_P(X,V) { int rc0O0O0O = XFY_CALL ( X ); if ( rc0O0O0O != 0 ) XFY_TRACE_RETURN ( V ); }
-#define XFY_CALL_RNZ_U(X,V) { int rc0O0O0O = XFY_CALL ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
-#define CALL_RNZ_P(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRACE_RETURN ( V ); }
-#define CALL_RNZ_U(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return ( V ); }
+#define XFY_TCALL(X) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET ( rc0O0O0O ); }
+#define XFY_CALL(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET ( rc0O0O0O ); }
+#define XFY_TCALL_P(X,V) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET ( V ); }
+#define XFY_TCALL_V(X,V) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
+#define XFY_CALL_P(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET ( V ); }
+#define XFY_CALL_V(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return ( V ); }
+#define XFY_USE_JNZ
+#define XFY_JNZ_VALUE	cXFYTraceFce.m_retValue
+
 #else
-#define XFY_CALL_RNZ(X) { int rc0O0O0O = XFY_CALL ( X ); if ( rc0O0O0O != 0 ) XFY_TRACE_RETURN_INT ( rc0O0O0O ); }
-#define CALL_RNZ(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRACE_RETURN_INT ( rc0O0O0O ); }
-#endif
-#define XFY_CALL_RNZ_V(X) { int rc0O0O0O = XFY_CALL ( X ); if ( rc0O0O0O != 0 ) return; }
-#define CALL_RNZ_V(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return; }
+#define XFY_TCALL(X) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET_INT ( rc0O0O0O ); }
+#define XFY_TCALL_P(X,P) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET_PTR ( P ); }
+#define XFY_TCALL_V(X,V) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
+#define XFY_CALL(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET_INT ( rc0O0O0O ); }
 
 #define XFY_USE_JNZ		int xfyRetCode = ITK_ok;
 #define XFY_JNZ_VALUE	xfyRetCode
-#define XFY_CALL_JNZ(X,L) { xfyRetCode = XFY_CALL ( X ); if ( xfyRetCode != 0 ) goto L; };
-#define CALL_JNZ(X,L) { int xfyRetCode = X; if ( xfyRetCode != 0 ) goto L; }
-#define XFY_TRACE_JNZ_RETURN XFY_TRACE_RETURN(xfyRetCode)
+#endif
+#define XFY_TCALL_N(X) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) return; }
+#define XFY_CALL_N(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return; }
 
+#define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_CALL ( X ); if ( XFY_JNZ_VALUE != 0 ) goto L; };
+#define XFY_CALL_L(X,L) { XFY_JNZ_VALUE= X; if ( XFY_JNZ_VALUE != 0 ) goto L; }
+#define XFY_TJNZ_RETURN XFY_TRET(XFY_JNZ_VALUE)
 
+#endif /* XFY_TRACE_ITK_H */

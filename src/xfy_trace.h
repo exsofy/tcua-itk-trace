@@ -4,6 +4,10 @@
 #include <time.h>
 #include <stdarg.h>
 
+#ifdef __cplusplus
+
+namespace XFY {
+
 typedef void (*TRACEVALUE)(const char *, void*, int);
 
 typedef struct {
@@ -14,12 +18,12 @@ typedef struct {
 
 
 // scope object for every tracing function
-class CXFYTraceFce
+	class TraceFce
 {
 
 // Constructors
 public:  
-  CXFYTraceFce( const char *fceName );
+	  TraceFce( const char *fceName );
 
 // Operations
 public:
@@ -29,10 +33,11 @@ public:
 
 // Implementation
 public:
-  ~CXFYTraceFce();
+	  ~TraceFce();
+	  int m_retValue;
 
 protected:
-  const char * m_pszFceName;
+	const char * m_pszFceName;
 
 private:
   SOutputParamm m_asOutList[8];
@@ -46,10 +51,13 @@ protected:
 
 
 // global object for tracing
-class CXFYTrace 
+class Trace
 {
 public:
-  enum eVALUE_TYPE { eVT_V = 0, eVT_V_END, eVT_I, eVT_O, eVT_IO, eVT_O_RET, eVT_UF, eVT_T_RET,
+  enum eVALUE_TYPE { eVT_V = 0, eVT_V_END,
+	  	  	  	   	 eVT_I, eVT_O, eVT_IO,
+	  	  	  	   	 eVT_IN, eVT_ON, eVT_ION,
+	  	  	  	   	 eVT_O_RET, eVT_UF, eVT_T_RET,
                      eVT_V_EX,
                      eVT_EMPTY, 
                      eVT_COUNT /*must be last*/ };
@@ -65,8 +73,8 @@ private:
 // Constructors
 
 public:
-  CXFYTrace();
-  ~CXFYTrace ();
+	  Trace();
+	  ~Trace ();
 
 // Attributes
 public:
@@ -105,8 +113,8 @@ public:
 
   static void finishFunctionHeader();  // ends the function header in journal file
 
-#define XFY_TRACE_VAL(ptype) static void putVariable ( const char *Name, const ptype &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL  )
-#define XFY_TRACE_PVAL(ptype) static void putVariable ( const char *Name, const ptype *const &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1 )
+	#define XFY_TRACE_VAL(ptype) static void putVariable ( const char *Name, const ptype &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL  )
+	#define XFY_TRACE_PVAL(ptype) static void putVariable ( const char *Name, const ptype *const &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL, int iDeep = -1 )
 
   XFY_TRACE_VAL ( char );
   XFY_TRACE_PVAL ( char );
@@ -143,22 +151,22 @@ public:
 #undef XFY_TRACE_VAL
 #undef XFY_TRACE_PVAL
 
-static void putVariable ( const char *Name, const void *const &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL );
+	static void putVariable ( const char *Name, const void *const &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL );
 
 #ifndef _AIX
-  static void putVariable ( const char *Name, char *const &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1  );
+	  static void putVariable ( const char *Name, char *const &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL, int iDeep = -1  );
 #endif
-static void putVariable ( const char *Name, char ** const &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1 );
-static void putVariable ( const char *Name, const char ** const &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1 );
+	static void putVariable ( const char *Name, char ** const &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL, int iDeep = -1 );
+	static void putVariable ( const char *Name, const char ** const &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL, int iDeep = -1 );
 #ifdef _WIN32
-static void putVariable ( const char *Name, char * &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1  );
-static void putVariable ( const char *Name, char ** &Value, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1 );
+	static void putVariable ( const char *Name, char * &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL, int iDeep = -1  );
+	static void putVariable ( const char *Name, char ** &Value, Trace::eVALUE_TYPE eVT = eVT_V, TraceFce *pzrhFce = NULL, int iDeep = -1 );
 #endif
 
-//static void putTraceVal ( const char *Name, CXFYTraceObject &Object, CXFYTrace::eVALUE_TYPE eVT = eVT_V, CXFYTraceFce *pzrhFce = NULL, int iDeep = -1 );
+	//static void putTraceVal ( const char *Name, XFY::TraceObject &Object, XFY::Trace::eVALUE_TYPE eVT = eVT_V, XFY::TraceFce *pzrhFce = NULL, int iDeep = -1 );
 
-#define RETURNS_VAL(ptype) ptype putFceReturns ( const ptype &Value, const CXFYTraceFce *pzrhFce = NULL )
-#define RETURNS_PVAL(ptype) ptype putFceReturns ( const ptype const &Value, const CXFYTraceFce *pzrhFce = NULL )
+	#define RETURNS_VAL(ptype) ptype putFceReturns ( const ptype &Value, const TraceFce *pzrhFce = NULL )
+	#define RETURNS_PVAL(ptype) ptype putFceReturns ( const ptype const &Value, const TraceFce *pzrhFce = NULL )
 
   RETURNS_PVAL ( void* );
 
@@ -192,7 +200,7 @@ static void putVariable ( const char *Name, char ** &Value, CXFYTrace::eVALUE_TY
   void doFceThrows ( const char *Msg );
 
   // print out error code translation
-  int putErrorReturns ( const int &Value, const CXFYTraceFce *pOutItem = NULL );
+	  int putErrorReturns ( const int &Value, const XFY::TraceFce *pOutItem = NULL );
 
 // Implementations
 protected:
@@ -225,7 +233,10 @@ private:
 };
 
 // global object definition for tracing
-extern CXFYTrace g_cXFYTrace;
+	extern Trace g_XFYTrace;
 
+}
+
+#endif
 
 #endif /* __XFY_TRACE_H_INCLUDED_ */

@@ -20,12 +20,11 @@ optionally function return.
 
 ```C++
 extern "C" DLLAPI int libACME_register_callbacks () {
-  XFY_TRACE_FCE ( libACME_register_callbacks );
-  XFY_TRACE_PARAM_0 ();
+  XFY_TFCE_P0 ();
  
-  XFY_CALL_RNZ ( CUSTOM_register_exit ( "libACME", "USER_gs_shell_init_module", (CUSTOM_EXIT_ftn_t)ACME_gs_shell_init_module) );
+  XFY_TCALL ( CUSTOM_register_exit ( "libACME", "USER_gs_shell_init_module", (CUSTOM_EXIT_ftn_t)ACME_gs_shell_init_module) );
 
-  XFY_TRACE_RETURN ( ITK_ok );
+  XFY_TRET ( ITK_ok );
 }
 ```
 
@@ -57,11 +56,11 @@ In journalling (jnl file)
 @*24019.3.2.6.13.5.18.205.1            --> 0.968000s
 @*24019.3.2.6.13.5.18.205.1            EPM_ask_root_task ( 0000e3f2)
 ...
-@*24019.3.2.6.13.5.18.205.6            ACME_ItemRevisionCheckSiblings ( NYI,  0,  '  none  , TCM Released, Other ',  NULL)
+@*24019.3.2.6.13.5.18.205.6            ACME_ItemRevisionCheckSiblings ( 0000d0e9,  0,  '  none  , TCM Released, Other ',  NULL)
 @*24019.3.2.6.13.5.18.205.6.1              --> 0.968000s
 @*24019.3.2.6.13.5.18.205.6.1              WSOM_where_referenced ( 0000d0e9,  1,  n_referencers,  levels,  referencers)
 ...
-@*24019.3.2.6.13.5.18.205.6.8              ACME_ItemRevisionCheckSiblings ( NYI,  NYI,  0,  '  none  , TCM Released, Other ',  NULL)
+@*24019.3.2.6.13.5.18.205.6.8              ACME_ItemRevisionCheckSiblings ( 0000d0e9,  00002ab3,  0,  '  none  , TCM Released, Other ',  NULL)
 @*24019.3.2.6.13.5.18.205.6.8.1                --> 1.000000s
 @*24019.3.2.6.13.5.18.205.6.8.1                BOM_create_window ( window)
 ...
