@@ -39,6 +39,7 @@
 #define XFY_TMSG XFY::g_XFYTrace.putMessage
 #define XFY_TRET(RetValue) return (XFY::g_XFYTrace.putFceReturns(RetValue,&cXFYTraceFce))
 #define XFY_TERR(RetValue) return(XFY::g_XFYTrace.putErrorReturns(RetValue,&cXFYTraceFce))
+#define XFY_TRET_OK return (XFY::g_XFYTrace.putFceReturns(ITK_ok,&cXFYTraceFce))
 
 #define XFY_TPAR_REPORT(P,T) XFY::g_XFYTrace.putVariable(#P,P,XFY::Trace::eVT_##T,&cXFYTraceFce)
 #define XFY_TPAR(P1,T1) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); }
@@ -62,15 +63,15 @@
 #define XFY_TFCE_P5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) XFY_TFCE; XFY_TPAR_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5)
 #define XFY_TFCE_P6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) XFY_TFCE XFY_TPAR_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6)
 
-#define XFY_TCALL_RET(X) (XFY::g_XFYTrace.reportFceCall(#X, __FILE__, __LINE__, (X)))
+#define XFY_TREP(X) (XFY::g_XFYTrace.reportFceCall(#X, __FILE__, __LINE__, (X)))
 #endif
 
 // Independent calls, used by trace and notrace
 #ifdef __cplusplus
-#define XFY_TCALL(X) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET ( rc0O0O0O ); }
+#define XFY_TCALL(X) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) XFY_TRET ( rc0O0O0O ); }
 #define XFY_CALL(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET ( rc0O0O0O ); }
-#define XFY_TCALL_P(X,V) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET ( V ); }
-#define XFY_TCALL_V(X,V) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
+#define XFY_TCALL_P(X,V) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) XFY_TRET ( V ); }
+#define XFY_TCALL_V(X,V) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
 #define XFY_CALL_P(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET ( V ); }
 #define XFY_CALL_V(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return ( V ); }
 #define XFY_USE_JNZ
@@ -85,11 +86,11 @@
 #define XFY_USE_JNZ		int xfyRetCode = ITK_ok;
 #define XFY_JNZ_VALUE	xfyRetCode
 #endif
-#define XFY_TCALL_N(X) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) return; }
+#define XFY_TCALL_N(X) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) return; }
 #define XFY_CALL_N(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return; }
 
-#define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_CALL ( X ); if ( XFY_JNZ_VALUE != 0 ) goto L; };
+#define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_TREP ( X ); if ( XFY_JNZ_VALUE != 0 ) goto L; };
 #define XFY_CALL_L(X,L) { XFY_JNZ_VALUE= X; if ( XFY_JNZ_VALUE != 0 ) goto L; }
-#define XFY_TJNZ_RETURN XFY_TRET(XFY_JNZ_VALUE)
+#define XFY_TRET_JNZ XFY_TRET(XFY_JNZ_VALUE)
 
 #endif /* XFY_TRACE_ITK_H */

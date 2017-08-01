@@ -21,7 +21,7 @@ int g_nVersionID = 0;
 //
 
 const char *aszValuePrefix[XFY::Trace::eVT_COUNT] = { "V ", "E ", "I ", "? ",
-		"! ", "I ", "? ", "! ", "O ", "C ", "R ", "X ", "  " };
+		"! ", "I ", "? ", "! ", "N ", "O ", "C ", "R ", "X ", "  " };
 
 static int g_iOutMode = 0;             // global static variable
 const char* XFY::Trace::s_pszNULL = NULL;   // global static variable
@@ -423,6 +423,7 @@ ReturnsValSimple( bool, "%d");
 ReturnsValSimple( unsigned int, "%u");
 ReturnsValSimple( long, "%ld");
 ReturnsValSimple( unsigned long, "%lu");
+ReturnsValSimple( unsigned long long, "%llu");
 ReturnsValSimple( double, "%lf");
 ReturnsValSimple( float, "%f");
 
@@ -446,6 +447,7 @@ ReturnsValPtrSimple( int, "%d");
 ReturnsValPtrSimple( unsigned int, "%u");
 ReturnsValPtrSimple( long, "%ld");
 ReturnsValPtrSimple( unsigned long, "%lu");
+ReturnsValPtrSimple( unsigned long long, "%llu");
 ReturnsValPtrSimple( double, "%lf");
 ReturnsValPtrSimple( float, "%f");
 
@@ -761,6 +763,7 @@ TraceSimple( unsigned_short, unsigned short, "hu%", nyi, &);
 // tag_t needs separate implementation of unsigned int
 // TraceSimple ( unsigned_int, unsigned int, "%u", nyi, & );
 TraceSimple( unsigned_long, unsigned long, "%lu", nyi, &);
+TraceSimple( unsigned_long_long, unsigned long long, "%llu", nyi, &);
 TraceSimple( float, float, "%f", nyi, &);
 TraceSimple( double, double, "%lf", double, (const double));
 
@@ -1041,12 +1044,14 @@ void XFY::Trace::putVariable(const char *pszName, const char * const &value,
 			}
 		} else {
 			if (g_iOutMode & eOM_DEBUGING) {
+				size_t stringLen = strlen ( value );
 				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-						"%*s%s%s = %p (char *)\n%*s%s*%s = \"%s\", len=%d\n",
+						"%*s%s%s = %p (char *)\n%*s%s*%s = \"%.128s\"%s, len=%d\n",
 						XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT],
 						pszName, value, XFY::g_XFYTrace.getLevel(), "",
 						aszValuePrefix[eVT_EMPTY], pszName, value,
-						strlen(value));
+						stringLen > 128 ? "..." : "",
+						stringLen);
 			}
 			if (g_iOutMode & eOM_JOURNALING) {
 				DO_JOURNALING( g_iOutMode, string, (const char *));
@@ -1142,11 +1147,13 @@ void XFY::Trace::putVariable(const char *pszName, const char ** const &value,
 //                    XFY::g_XFYTrace.getLevel() + 2, "", aszValuePrefix[eVT_EMPTY], pszName, *pszArray, iDeep );
 
 					if (iDeep < 0) {
+						size_t stringLen = strlen(*pszArray);
 						fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-								"%*s%s**%s = \"%s\", len=%d\n",
+								"%*s%s**%s = \"%.128s\"%s, len=%d\n",
 								XFY::g_XFYTrace.getLevel() + 2, "",
 								aszValuePrefix[eVT_EMPTY], pszName, *pszArray,
-								strlen(*pszArray));
+								stringLen > 128 ? "..." : "",
+								stringLen);
 					} else {
 						for (int iI = 0; iI < iDeep; iI++) {
 							if (pszArray[iI] == NULL) {

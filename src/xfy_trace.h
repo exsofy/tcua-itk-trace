@@ -1,5 +1,5 @@
-#ifndef __XFY_TRACE_H_INCLUDED_
-#define __XFY_TRACE_H_INCLUDED_
+#ifndef XFY_TRACE_H_
+#define XFY_TRACE_H_
 
 #include <time.h>
 #include <stdarg.h>
@@ -57,6 +57,7 @@ public:
   enum eVALUE_TYPE { eVT_V = 0, eVT_V_END,
 	  	  	  	   	 eVT_I, eVT_O, eVT_IO,
 	  	  	  	   	 eVT_IN, eVT_ON, eVT_ION,
+					 eVT_NYI,
 	  	  	  	   	 eVT_O_RET, eVT_UF, eVT_T_RET,
                      eVT_V_EX,
                      eVT_EMPTY, 
@@ -142,6 +143,9 @@ public:
   XFY_TRACE_VAL ( unsigned long );
   XFY_TRACE_PVAL ( unsigned long );
 
+  XFY_TRACE_VAL ( unsigned long long );
+  XFY_TRACE_PVAL ( unsigned long long );
+
   XFY_TRACE_VAL ( float );
   XFY_TRACE_PVAL ( float );
 
@@ -177,16 +181,22 @@ public:
 
   RETURNS_VAL ( int );
   RETURNS_PVAL ( int* );
+
   RETURNS_VAL ( unsigned int );
   RETURNS_PVAL ( unsigned int* );
 
   RETURNS_VAL ( long );
   RETURNS_PVAL ( long* );
+
   RETURNS_VAL ( unsigned long );
   RETURNS_PVAL ( unsigned long* );
 
+  RETURNS_VAL ( unsigned long long );
+  RETURNS_PVAL ( unsigned long long* );
+
   RETURNS_VAL ( double );
   RETURNS_PVAL ( double* );
+
   RETURNS_VAL ( float );
   RETURNS_PVAL ( float* );
 
@@ -239,4 +249,4 @@ private:
 
 #endif
 
-#endif /* __XFY_TRACE_H_INCLUDED_ */
+#endif /* XFY_TRACE_H_ */
