@@ -6,7 +6,19 @@
 
 #ifdef __cplusplus
 
+#ifdef XFYUSELIB
+#ifdef XFYLIB
+#define XFY_API __declspec(dllexport)
+#else
+#define XFY_API __declspec(dllimport)
+#endif
+#else
+#define XFY_API
+#endif
+
+
 namespace XFY {
+
 
 typedef void (*TRACEVALUE)(const char *, void*, int);
 
@@ -18,7 +30,7 @@ typedef struct {
 
 
 // scope object for every tracing function
-	class TraceFce
+	class XFY_API TraceFce
 {
 
 // Constructors
@@ -51,7 +63,7 @@ protected:
 
 
 // global object for tracing
-class Trace
+class XFY_API Trace
 {
 public:
   enum eVALUE_TYPE { eVT_V = 0, eVT_V_END,
@@ -243,10 +255,13 @@ private:
 };
 
 // global object definition for tracing
-	extern Trace g_XFYTrace;
+	extern XFY_API Trace g_XFYTrace;
+}  /* namespace XFY */
 
-}
+#endif
 
+#ifdef XFY_API
+#undef XFY_API
 #endif
 
 #endif /* XFY_TRACE_H_ */

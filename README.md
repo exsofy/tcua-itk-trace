@@ -10,6 +10,7 @@ programmer and provide full journalling support for issue analysis.
 - full support of Teamcenter journalling
 - simplified tracing for code run overview
 - itk call return code evaluation
+- proven in single/multiple shared libraries, handlers, stadalone executables and SOA services
 
 The tracing and journalling are switched out per default and might be
 activated on customer site for offline analysis.
@@ -24,7 +25,7 @@ extern "C" DLLAPI int libACME_register_callbacks () {
  
   XFY_TCALL ( CUSTOM_register_exit ( "libACME", "USER_gs_shell_init_module", (CUSTOM_EXIT_ftn_t)ACME_gs_shell_init_module) );
 
-  XFY_TRET ( ITK_ok );
+  XFY_TRET_OK;
 }
 ```
 

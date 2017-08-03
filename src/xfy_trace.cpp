@@ -9,6 +9,9 @@
 #include "xfy_trace.h"
 
 // global object definition for tracing
+#ifdef XFYLIB
+__declspec(dllexport)
+#endif
 XFY::Trace XFY::g_XFYTrace;
 
 // Global Version ID string
