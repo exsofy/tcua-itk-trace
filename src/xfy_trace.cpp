@@ -863,9 +863,19 @@ void XFY::Trace::putVariable(const char *pszName, const unsigned int &value,
 	if (eVT != eVT_O && eVT != eVT_ON) {
 		if (g_iOutMode & eOM_DEBUGING) {
 			fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-					"%*s%s%s = %u (%s)\n", XFY::g_XFYTrace.getLevel(), "",
+					"%*s%s%s = %u (%s)", XFY::g_XFYTrace.getLevel(), "",
 					aszValuePrefix[eVT], pszName, value,
-					eVT == eVT_IN ? "uint" : "tag_t");
+					( eVT == eVT_IN || eVT == eVT_ION ) ? "uint" : "tag_t");
+			if ( eVT == eVT_I || eVT == eVT_IO ) {
+				char * uid = NULL;
+				POM_tag_to_uid( value, &uid );
+				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+						" <%s>\n", uid );
+				MEM_free ( uid );
+			} else {
+				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+						"\n" );
+			}
 		}
 		if (g_iOutMode & eOM_JOURNALING) {
 			if (eVT == eVT_IN) {
@@ -932,10 +942,20 @@ void XFY::Trace::putVariable(const char *pszName,
 	if (eVT != eVT_O && eVT != eVT_ON) {
 		if (g_iOutMode & eOM_DEBUGING) {
 			fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-					"%*s%s%s = %p (%s *)   *%s = %u\n",
+					"%*s%s%s = %p (%s *)   *%s = %u",
 					XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT],
-					pszName, value, eVT == eVT_IN ? "uint" : "tag_t", pszName,
-					*value);
+					pszName, value, ( eVT == eVT_IN || eVT == eVT_ION ) ? "uint" : "tag_t", pszName,
+					value != NULL ? *value : 0 );
+			if ( ( eVT == eVT_I || eVT == eVT_IO ) && value != NULL ) {
+				char * uid = NULL;
+				POM_tag_to_uid( *value, &uid );
+				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+						" <%s>\n", uid );
+				MEM_free ( uid );
+			} else {
+				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+						"\n" );
+			}
 		}
 	}
 	if (eVT == eVT_O || eVT == eVT_IO)
