@@ -17,7 +17,7 @@ activated on customer site for offline analysis.
 
 ## Usage
 The code has to be extended by macros for each function, ITK call and 
-optionally function return.
+optionally function return. see [common patterns](https://github.com/exsofy/docs/CommonTracingPattern.md)
 
 ```C++
 extern "C" DLLAPI int libACME_register_callbacks () {
@@ -38,6 +38,9 @@ set XFY_TRACE_FLAGS=255
 ```
 
 ## Results
+
+Short code tracing is stored in [tracing file](https://github.com/exsofy/docs/TracingOutput.md)
+
 In journalling (jnl file)
 ...
 ```

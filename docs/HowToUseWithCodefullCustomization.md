@@ -13,7 +13,7 @@ Add xfy subdirectory to repository and add property `svn:externals` with content
 after update, the content shall be available at the latest github version.
 
 If you wish to fix the version, put it at first place
-`-r5 https://github.com/exsofy/tcua-itk-trace/trunk/src trace`
+`-r8 https://github.com/exsofy/tcua-itk-trace/trunk/src trace`
 In such case, the source sticks at the defined version and is not affected
 by github changes.
 

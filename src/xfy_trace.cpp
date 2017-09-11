@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+#include <share.h>
+#endif
+
 #include <tc/tc.h>
 #include <mld/journal/journal.h>
 #include <tc/emh.h>
@@ -33,10 +37,7 @@ const int* XFY::Trace::s_piNULL = NULL;     // global static variable
 //-----------------------------------------------------------------------
 // Constructor : XFY::Trace
 // Description : Initialize member variables with default or values from
-//               environmet
-//-----------------------------------------------------------------------
-// Changes : 
-// Date        By      Reason
+//               environment
 //-----------------------------------------------------------------------
 XFY::Trace::Trace() {
 
@@ -137,10 +138,6 @@ XFY::Trace::Trace() {
 // Description : Get output stream, if file not opened yet, open it
 // Returns     : FILE Pointer to output stream
 //-----------------------------------------------------------------------
-// Written by   Svatos Coufal on 30.03.00
-// Changes : 
-// Date        By      Reason
-//-----------------------------------------------------------------------
 void* XFY::Trace::getOutputFile() {
 	if (m_pFile != NULL) {
 		if (m_iUseFlush)
@@ -159,12 +156,20 @@ void* XFY::Trace::getOutputFile() {
 
 		transFileName(m_szOutFile, szWOutFile, _MAX_PATH, true);
 
-		if ((fopen_s((FILE**) &m_pFile, szWOutFile, "w") == 0)
-				&& (m_pFile == NULL)) {
-			fprintf(stderr,
-					"Error: Trace File %s not opened. Standart output is used.",
-					szWOutFile);
-			m_pFile = stdout;
+#ifdef WIN32
+		// try to open in read shared mode
+		m_pFile = _fsopen ( szWOutFile, "w", _SH_DENYWR );
+		if (m_pFile == NULL)
+#endif
+		{
+			if ((fopen_s((FILE**) &m_pFile, szWOutFile, "w") == 0)
+					&& (m_pFile == NULL))
+			{
+				fprintf(stderr,
+						"Error: Trace File %s not opened. Standart output is used.",
+						szWOutFile);
+				m_pFile = stdout;
+			}
 		}
 	}
 	putFileBreak();

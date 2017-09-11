@@ -9,7 +9,8 @@ int DataDefinition::load() {
 	XFY_TFCE_P0();
 	
 	XFY_TRET_OK;
-}```
+}
+```
 
 ## Universal function tracing
 ### Entry point
@@ -52,7 +53,8 @@ int XFY_POM_is_object_a ( tag_t tObject, tag_t tClassID, logical *isA )
   XFY_TCALL ( POM_class_of_instance ( tObject, &tObjectClass ) );
 
   XFY_TRET ( POM_is_descendant ( tClassID, tObjectClass, isA ) );
-}```
+}
+```
 
 ### Single function call error handling
 
