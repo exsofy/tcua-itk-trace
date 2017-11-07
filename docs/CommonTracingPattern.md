@@ -21,9 +21,19 @@ int DataDefinition::load() {
 
 ## General error handling
 
+All the macros have basic erro handling build in. Each error will be 
+reported in syslog immediately, regardless if it is removed from error
+stack later.
+
+Try to ommit the error by pre-check, do not trace the function or 
+mask its return with & 0.
+
+#### Masked return value
+```C++ XFY_TREP ( AOM_refresh ( tObj, false ) & 0 );
+
 ### Function calls without resource release
 If no memory is allocated or the memory release is performed by scope object,
-the base error handling is used
+the base error handling is use the *XFY_TREP* macro to get the return value.
 
 ### With resource release
 From the point where resource is reserved (e.g. Memory allocation, BOM Window opening)
@@ -34,10 +44,11 @@ This is the simpliest way. There is no difference to code without resource
 management.
 
 #### Resource managed by release block
-The macro XFY_TCALL_L jumps in case of error to defined label.
+The macro *XFY_TCALL_L* jumps in case of error to defined label.
 
 #### Resource managed by return code check
-If labels are not acceptable
+If labels are not acceptable, use the *XFY_TREP* macro to get the return value
+and check it by code.
 
 
 ## Special error handling
@@ -58,8 +69,8 @@ int XFY_POM_is_object_a ( tag_t tObject, tag_t tClassID, logical *isA )
 
 ### Single function call error handling
 
-If a single function call is evaluated, use ~XFY_TREP~ to get the error code.
-Unhadled error value is returned by XFY_TERR
+If a single function call is evaluated, use *XFY_TREP* to get the error code.
+Return the error value by *XFY_TERR*, if necessary.
 ```C++
 	XFY::ITKString docID;
 	int iFail = XFY_TREP( AOM_ask_value_string( tItem, docIdAttrName, &docID ) );
@@ -76,8 +87,8 @@ Unhadled error value is returned by XFY_TERR
 ### Multiple function call error handling
 
 If mutliple function shall be handled the same way is usage with label possible
-The macro XFY_TCALL_L jumps to defined label, which can manage the error.
-The return value is accessible over XFY_JNZ_VALUE macro.
+The macro *XFY_TCALL_L* jumps to defined label, which can manage the error.
+The return value is accessible over *XFY_JNZ_VALUE* macro.
 
 ```C++
 	XFY::ITKString uifValue;
@@ -122,9 +133,9 @@ PROPOK:
 ## Convert standard journalling
 
 ### Headers
-To use the functions, replace journal.h. with xfy/trace/xfy_trace_itk.h
+To use the XFY functions, replace journal/journal.h with xfy/trace/xfy_trace_itk.h
 
-Standard journalling
+### Standard journalling
 ```C
 #include <journal/journal.h>
 
@@ -155,7 +166,7 @@ int AE_ask_tool_input_formats(tag_t   tool,
 }
 ```
 
-XFY journalling
+### XFY journalling
 
 ```C++
 #include <xfy/trace/xfy_trace_itk.h>

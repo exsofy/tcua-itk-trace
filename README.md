@@ -17,7 +17,7 @@ activated on customer site for offline analysis.
 
 ## Usage
 The code has to be extended by macros for each function, ITK call and 
-optionally function return. see [common patterns](https://github.com/exsofy/docs/CommonTracingPattern.md)
+optionally function return. see [common patterns](docs/CommonTracingPattern.md)
 
 ```C++
 extern "C" DLLAPI int libACME_register_callbacks () {
@@ -30,8 +30,10 @@ extern "C" DLLAPI int libACME_register_callbacks () {
 ```
 
 ## Activation
-- Journalling is activated by standard Teamcenter process
 - Tracing is activated by environment variables
+- Journalling is activated by standard Teamcenter process
+- 
+
 ```
 set XFY_TRACE_FILE=C:\temp\*P_*D.log
 set XFY_TRACE_FLAGS=255
@@ -39,9 +41,21 @@ set XFY_TRACE_FLAGS=255
 
 ## Results
 
-Short code tracing is stored in [tracing file](https://github.com/exsofy/docs/TracingOutput.md)
+### Tracing file
+Short code tracing is stored in [tracing file](docs/TracingOutput.md)
 
-In journalling (jnl file)
+### Syslog file
+```
+ PREF_ask_char_values ( prefrence, preferences.sizePtr(), &preferences ) returns [1700]
+  Teamcenter ERROR: 1700 [The preference "lp3_ReportColumnConfiguration" cannot be found.]
+  in file [.\src\server\Lp3Service\lp3_columnconfigurator.cxx], line [103], at 16:20:19
+
+ TXTSRV_get_unsubstituted_text_resource ( "lp3_column_title_object", &header ) returns [128027]
+  Teamcenter ERROR: 128027 [The key "lp3_column_title_object" could not be found in the TextServer text resource files.]
+  in file [.\src\server\Lp3Service\lp3_columnconfigurator.cxx], line [135], at 16:20:19
+```
+  
+###Journalling (jnl file)
 ...
 ```
 @*23758.5.2.2.55       CUSTOM_register_exit ( 'libtcpb',  'USERSERVICE_register_methods',  0000000180005A40)

@@ -613,6 +613,7 @@ int XFY::Trace::putMessageVA(const char *format, va_list arglist) const {
 //   ufName   I : Name of called function
 //   fileName I : Name of sourcefile
 //   lineNum  I : number of source code line
+//   iRetVal  I : function return code
 //-----------------------------------------------------------------------
 // Written by   Svatos Coufal on 11.04.00
 // Changes : 
@@ -620,22 +621,27 @@ int XFY::Trace::putMessageVA(const char *format, va_list arglist) const {
 //-----------------------------------------------------------------------
 int XFY::Trace::reportFceCall(const char *ufName, const char *fileName,
 		const int lineNum, const int iRetVal) {
+	char tmdescr[200] = { 0 };
+
+	if ( iRetVal != ITK_ok ) {
+		// error occurred
+		time_t t = time(0); // obtain the current time_t value
+		tm now;
+		if ((localtime_s(&now, &t) != 0)
+				|| (strftime(tmdescr, sizeof(tmdescr) - 1, ", at %H:%M:%S",
+						&now) <= 0)) {
+			// error occurred, empty string
+			*tmdescr = 0;
+		}
+	}
+
 	if (g_iOutMode & eOM_DEBUGING) {
 		if (iRetVal == 0 && showUfCall()) {
 			fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(), "%*s%s%s\n",
 					XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT_UF],
 					ufName);
 		}
-		if (iRetVal) {
-			time_t t = time(0); // obtain the current time_t value
-			tm now;
-			char tmdescr[200] = { 0 };
-			if ((localtime_s(&now, &t) != 0)
-					|| (strftime(tmdescr, sizeof(tmdescr) - 1, ", at %H:%M:%S",
-							&now) <= 0)) {
-				// error occured, empty string
-				*tmdescr = 0;
-			}
+		if (iRetVal != ITK_ok ) {
 
 			fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
 					"*** %s line : %d%s\n*** %s\n", fileName, lineNum, tmdescr,
@@ -648,8 +654,29 @@ int XFY::Trace::reportFceCall(const char *ufName, const char *fileName,
 		;
 	}
 
+	if (iRetVal != ITK_ok ) {
+		// every error in syslog
+		TC_write_syslog( " %s returns [%d]\n", ufName, iRetVal );
+		int nFails;
+		const int *aiSeverities = NULL;
+		const int *aiFails = NULL;
+		const char **asTexts = NULL;
+		EMH_ask_errors( &nFails, &aiSeverities, &aiFails, &asTexts );
+		if ( nFails > 0 ) {
+			TC_write_syslog( "  Teamcenter ERROR: %d [%s]\n", aiFails[nFails-1], asTexts[nFails-1]);
+		}
+		else {
+			char *s = NULL;
+			EMH_ask_error_text (iRetVal, &s);
+			TC_write_syslog( "  Teamcenter ERROR: [%s]\n", s);
+			if (s != 0) MEM_free (s);
+		}
+		TC_write_syslog( "  in file [%s], line [%d]%s\n\n", fileName, lineNum, tmdescr );
+	}
+
 	return (iRetVal);
 }
+
 
 //-----------------------------------------------------------------------
 // Object      : XFY::Trace
