@@ -37,3 +37,13 @@ X - exception
         R Value = 7005 
       <-- X4xy::assignInstance (0.00 sec) 
 ```
+
+# Syslog file
+
+All errors are automatically tracked in syslog file, independent of configuration
+
+```
+ TCTYPE_ask_name2 ( tOjectType, &typeName ) returns [39021]
+  Teamcenter ERROR: 39021 [Fehler bei Suche nach entsprechendem ImanType  aufgetreten. ]
+  in file [.\src\server\X4xy\x4xy_structure_loader.cxx], line [77], at 06:00:12
+```

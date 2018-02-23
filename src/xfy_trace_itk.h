@@ -89,8 +89,13 @@
 #define XFY_TCALL_N(X) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) return; }
 #define XFY_CALL_N(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return; }
 
+// call ITK function X and go to label L on fail
 #define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_TREP ( X ); if ( XFY_JNZ_VALUE != 0 ) goto L; };
+// call XFY traced function X and go to label L on fail
 #define XFY_CALL_L(X,L) { XFY_JNZ_VALUE= X; if ( XFY_JNZ_VALUE != 0 ) goto L; }
+// return code of last XFY_CALL_L
 #define XFY_TRET_JNZ XFY_TRET(XFY_JNZ_VALUE)
+// return error code if last traced function failed
+#define XFY_TRET_NOK { if ( XFY_JNZ_VALUE != 0 ) XFY_TRET(XFY_JNZ_VALUE); }
 
 #endif /* XFY_TRACE_ITK_H */

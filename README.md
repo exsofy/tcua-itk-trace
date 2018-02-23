@@ -55,7 +55,7 @@ Short code tracing is stored in [tracing file](docs/TracingOutput.md)
   in file [.\src\server\Lp3Service\lp3_columnconfigurator.cxx], line [135], at 16:20:19
 ```
   
-###Journalling (jnl file)
+### Journalling (jnl file)
 ...
 ```
 @*23758.5.2.2.55       CUSTOM_register_exit ( 'libtcpb',  'USERSERVICE_register_methods',  0000000180005A40)

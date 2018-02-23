@@ -29,7 +29,9 @@ Try to ommit the error by pre-check, do not trace the function or
 mask its return with & 0.
 
 #### Masked return value
-```C++ XFY_TREP ( AOM_refresh ( tObj, false ) & 0 );
+```C++
+ XFY_TREP ( AOM_refresh ( tObj, false ) & 0 );
+```
 
 ### Function calls without resource release
 If no memory is allocated or the memory release is performed by scope object,
@@ -84,6 +86,7 @@ Return the error value by *XFY_TERR*, if necessary.
 	}
 ```
 
+
 ### Multiple function call error handling
 
 If mutliple function shall be handled the same way is usage with label possible
@@ -129,6 +132,29 @@ PROPERROR:
 PROPOK:	
 ```
 
+### Continue after error
+
+If the error can be ignored, but is reported
+The macro *XFY_TCALL_L* jumps to defined label, which manages error without break the run.
+The return value is accessible over *XFY_JNZ_VALUE* macro.
+
+```C++
+	for ( auto itPropValue = propertyValues.begin(); itPropValue != propertyValues.end(); itPropValue++  ) {
+		// apply remaining property value
+		bool isConsumed = false;
+		if ( itPropValue->onObj == PropertyValue::ITEM ) {
+			XFY_CALL_L ( acme_setProperty( tItemType, tNewItem, itPropValue->name.c_str(), itPropValue->value, &isItemChanged ), PROPERTYUNSET );
+			isItemChanged |= isConsumed;
+		} else if ( itPropValue->onObj == PropertyValue::REVISION ) {
+			XFY_CALL_L ( acme_setProperty( tItemRevType, tNewRev, itPropValue->name.c_str(), itPropValue->value, &isConsumed ), PROPERTYUNSET );
+			isRevisionChanged |= isConsumed;
+		}
+PROPERTYUNSET:		
+		if ( XFY_JNZ_VALUE != ITK_ok ) {
+			runtimeInfo.getStoredError(tNewRev,EMH_severity_error,XFY_JNZ_VALUE);
+		}
+	}
+```
 
 ## Convert standard journalling
 
