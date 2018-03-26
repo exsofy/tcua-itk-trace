@@ -37,9 +37,9 @@
 #endif
 
 #define XFY_TMSG XFY::g_XFYTrace.putMessage
-#define XFY_TRET(RetValue) return (XFY::g_XFYTrace.putFceReturns(RetValue,&cXFYTraceFce))
-#define XFY_TERR(RetValue) return(XFY::g_XFYTrace.putErrorReturns(RetValue,&cXFYTraceFce))
-#define XFY_TRET_OK return (XFY::g_XFYTrace.putFceReturns(ITK_ok,&cXFYTraceFce))
+#define XFY_TRET(RetValue) return (XFY::g_XFYTrace.putFceReturns(RetValue,&cXFYTraceFce,__LINE__))
+#define XFY_TERR(RetValue) return(XFY::g_XFYTrace.putErrorReturns(RetValue,&cXFYTraceFce,__LINE__))
+#define XFY_TRET_OK return (XFY::g_XFYTrace.putFceReturns(ITK_ok,&cXFYTraceFce,__LINE__))
 
 #define XFY_TPAR_REPORT(P,T) XFY::g_XFYTrace.putVariable(#P,P,XFY::Trace::eVT_##T,&cXFYTraceFce)
 #define XFY_TPAR(P1,T1) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); }

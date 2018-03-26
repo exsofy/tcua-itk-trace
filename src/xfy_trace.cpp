@@ -401,12 +401,14 @@ size_t XFY::Trace::transFileName(const char *pszFrom, char *pszTo,
 	return strlen(pszTo);
 }
 
-int XFY::Trace::putFceReturns(const int &Value, const XFY::TraceFce *pOutItem) {
+int XFY::Trace::putFceReturns(const int &Value, const XFY::TraceFce *pOutItem, const int fromLine ) {
 	if (XFY::g_XFYTrace.showParam()) {
 		if (g_iOutMode & eOM_DEBUGING) {
 			fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-					"%*s%sValue = %d \n", XFY::g_XFYTrace.getLevel(), "",
+					"%*s%sValue = %d", XFY::g_XFYTrace.getLevel(), "",
 					aszValuePrefix[eVT_T_RET], Value);
+			if ( fromLine >= 0 ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), ", line=%d\n", fromLine );
+			else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "\n" );
 		}
 		if (g_iOutMode & eOM_JOURNALING) {
 			JOURNAL_return_value(Value);
@@ -417,10 +419,12 @@ int XFY::Trace::putFceReturns(const int &Value, const XFY::TraceFce *pOutItem) {
 }
 
 #define ReturnsValSimple(ptype,pform) \
-ptype XFY::Trace::putFceReturns ( const ptype &Value, const XFY::TraceFce *pOutItem ) \
+ptype XFY::Trace::putFceReturns ( const ptype &Value, const XFY::TraceFce *pOutItem, const int fromLine ) \
 { if ( XFY::g_XFYTrace.showParam() ) {\
     if ( g_iOutMode & eOM_DEBUGING ) { \
-      fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%sValue = " pform "\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT_T_RET], Value); }\
+      fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%sValue = " pform, XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT_T_RET], Value); \
+      if ( fromLine >= 0 ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), ", line=%d\n", fromLine );\
+      else fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "\n" ); }\
   } return (ptype)Value;\
 }
 
@@ -440,12 +444,14 @@ ReturnsValSimple( char, "%c");
 #undef ReturnsValSimple
 
 #define ReturnsValPtrSimple(ptype,pform) \
-ptype * XFY::Trace::putFceReturns ( const ptype *const &Value, const XFY::TraceFce *pOutItem ) \
+ptype * XFY::Trace::putFceReturns ( const ptype *const &Value, const XFY::TraceFce *pOutItem, const int fromLine  ) \
 { if ( XFY::g_XFYTrace.showParam() ) { \
     if ( g_iOutMode & eOM_DEBUGING ) { \
       fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%sValue(%p) = ", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT_T_RET], Value );\
-      if ( Value != NULL ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), pform"\n", *Value);\
-      else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "NULL\n" ); } }\
+      if ( Value != NULL ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), pform, *Value);\
+      else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "NULL" ); \
+      if ( fromLine >= 0 ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), ", line=%d\n", fromLine ); \
+      else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "\n" ); } }\
     if ( g_iOutMode & eOM_JOURNALING ) { \
     } \
   return (ptype *)Value;\
@@ -462,12 +468,14 @@ ReturnsValPtrSimple( float, "%f");
 #undef ReturnsValPtrSimple
 
 #define ReturnsValDefSimple(ptype,pform) \
-ptype XFY::Trace::putFceReturns ( const ptype const &Value, const XFY::TraceFce *pOutItem ) \
+ptype XFY::Trace::putFceReturns ( const ptype const &Value, const XFY::TraceFce *pOutItem, const int fromLine ) \
 { if ( XFY::g_XFYTrace.showParam() ) { \
     if ( g_iOutMode & eOM_DEBUGING ) { \
       fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%sValue(%p) = ", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT_T_RET], Value );\
-      if ( Value != NULL ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), pform"\n", Value);\
-      else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "NULL\n" ); } }\
+      if ( Value != NULL ) fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), pform, Value);\
+      else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "NULL" ); \
+      if ( fromLine >= 0 )  fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), ", line=%d\n", fromLine ); \
+      else                 fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "\n" ); } }\
     if ( g_iOutMode & eOM_JOURNALING ) { \
     } \
   return (ptype)Value;\
@@ -539,7 +547,7 @@ void XFY::Trace::putErrorMessage(const int iMessage) {
 // Date        By      Reason
 //-----------------------------------------------------------------------
 int XFY::Trace::putErrorReturns(const int &Value,
-		const XFY::TraceFce *pOutItem) {
+		const XFY::TraceFce *pOutItem, const int /*fromLine*/ ) {
 	putErrorMessage(Value);
 //  if ( XFY::g_XFYTrace.ShowParam() )
 //    fprintf( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%sValue = " pform "\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT_T_RET], Value);

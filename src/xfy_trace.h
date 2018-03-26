@@ -181,8 +181,8 @@ public:
 
 	//static void putTraceVal ( const char *Name, XFY::TraceObject &Object, XFY::Trace::eVALUE_TYPE eVT = eVT_V, XFY::TraceFce *pzrhFce = NULL, int iDeep = -1 );
 
-	#define RETURNS_VAL(ptype) ptype putFceReturns ( const ptype &Value, const TraceFce *pzrhFce = NULL )
-	#define RETURNS_PVAL(ptype) ptype putFceReturns ( const ptype const &Value, const TraceFce *pzrhFce = NULL )
+	#define RETURNS_VAL(ptype) ptype putFceReturns ( const ptype &Value, const TraceFce *pzrhFce = NULL, const int fromLine = -1 )
+	#define RETURNS_PVAL(ptype) ptype putFceReturns ( const ptype const &Value, const TraceFce *pzrhFce = NULL, const int fromLine = -1 )
 
   RETURNS_PVAL ( void* );
 
@@ -222,7 +222,7 @@ public:
   void doFceThrows ( const char *Msg );
 
   // print out error code translation
-	  int putErrorReturns ( const int &Value, const XFY::TraceFce *pOutItem = NULL );
+	  int putErrorReturns ( const int &Value, const XFY::TraceFce *pOutItem = NULL, const int fromLine = -1 );
 
 // Implementations
 protected:

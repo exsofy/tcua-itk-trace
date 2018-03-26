@@ -18,6 +18,19 @@ int DataDefinition::load() {
 
 ## Entry point with parameters together
 
+## More than 6 tracked parameter
+The provided macros supportup to 6 function parameters. If more parameters
+are necessary the parameter list can be broken in multiple definitions
+```C++
+// function with 7 parameters
+static int setUpdateProperty(tag_t tObjectType, tag_t tObject,
+		const char *propName, const std::string &value, bool isCreated, bool *isConsumed,
+		bool *isLocked) {
+	XFY_TFCE;
+	XFY_TPAR(tObjectType,I); // first parameter, can be repeated
+	XFY_TPAR_6( tObject, I, propName, I, value.c_str(), I,
+			isCreated, I, isConsumed, O, isLocked, IO); // last 6 parameters
+```
 
 ## General error handling
 
