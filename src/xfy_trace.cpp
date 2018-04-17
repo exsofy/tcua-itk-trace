@@ -907,11 +907,22 @@ void XFY::Trace::putVariable(const char *pszName, const unsigned int &value,
 					aszValuePrefix[eVT], pszName, value,
 					( eVT == eVT_IN || eVT == eVT_ION ) ? "uint" : "tag_t");
 			if ( eVT == eVT_I || eVT == eVT_IO ) {
-				char * uid = NULL;
-				POM_tag_to_uid( value, &uid );
-				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-						" <%s>\n", uid );
-				MEM_free ( uid );
+				if ( g_iOutMode & eOM_JOURNALING ) {
+					// journaling active, not use ITK call
+					fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+							" <%d>\n", value );
+				} else {
+					if ( value != NULLTAG ) {
+						char * uid = NULL;
+						POM_tag_to_uid( value, &uid );
+						fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+								" <%s>\n", uid );
+						MEM_free ( uid );
+					} else {
+						fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
+								" <NULLTAG>\n" );
+					}
+				}
 			} else {
 				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
 						"\n" );
