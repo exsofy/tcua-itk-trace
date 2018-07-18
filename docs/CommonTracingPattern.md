@@ -14,9 +14,33 @@ int DataDefinition::load() {
 
 ## Universal function tracing
 ### Entry point
+Plain function entry is defined by *XFY_TFCE* macro. It put function entry
+and leave into journalling, but do not manage any parameters. 
+The parameters must be managed explicitly after this macro.
+```C++
+int ACME4_AskStringValues( METHOD_message_t * /*msg*/, va_list args )
+{
+	XFY_TFCE;
+```
+
 ### Parameters
+Function parameters are managed by macros *XFY_TPAR* and *XFY_TPAR_[0..6]*
+*XFY_TPAR* add one parameter but does not close the parameter list.
+*XFY_TPAR_[0..6]* add 0 to 6 parameters and close the parameter list.
+Each parametr is defined by two values; the parameter itself and 
+direction marker. The direction marker is one of following values:
+| Marker | Description |
+| ---: | --- |
+| I | Input |
+| O | Output |
+| IO | Input/Output |
+| IN | Input unsigned int as number (not as tag_t) |
+| IN | Output unsigned int as number (not as tag_t) |
+| ION | Input/Output unsigned int as number (not as tag_t) |
 
 ## Entry point with parameters together
+Function with up to 6 parameters can ahve entry point combined wit parameter
+list in one macro *XFY_TFCE_P[0..6]*.
 
 ## More than 6 tracked parameter
 The provided macros supportup to 6 function parameters. If more parameters
@@ -30,6 +54,25 @@ static int setUpdateProperty(tag_t tObjectType, tag_t tObject,
 	XFY_TPAR(tObjectType,I); // first parameter, can be repeated
 	XFY_TPAR_6( tObject, I, propName, I, value.c_str(), I,
 			isCreated, I, isConsumed, O, isLocked, IO); // last 6 parameters
+```
+## Variadic arguments
+Variadic arguments can be traced as function parameters after expansion.
+The arguments are represented in journal file as list of real parameters.
+```C++
+int ACME4_AskStringValues( METHOD_message_t * /*msg*/, va_list args )
+{
+	XFY_TFCE;
+
+	tag_t typeTag = NULLTAG;
+	int* n_results;
+	char*** resultValues;
+
+	// read parameters
+	typeTag      = va_arg( args, tag_t );
+	n_results    = va_arg( args, int* );
+	resultValues = va_arg( args, char *** );
+	XFY_TPAR_3(typeTag,I,n_results,IO,resultValues,IO);
+
 ```
 
 ## General error handling

@@ -910,7 +910,7 @@ void XFY::Trace::putVariable(const char *pszName, const unsigned int &value,
 				if ( g_iOutMode & eOM_JOURNALING ) {
 					// journaling active, not use ITK call
 					fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-							" <%d>\n", value );
+							"\n" );
 				} else {
 					if ( value != NULLTAG ) {
 						char * uid = NULL;
