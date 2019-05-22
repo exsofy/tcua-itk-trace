@@ -142,6 +142,29 @@ Return the error value by *XFY_TERR*, if necessary.
 	}
 ```
 
+### Ignore calls after first error
+
+If first function call with error shal stop the following call but not 
+the program flow, the chain call macros *ITK_OK_TCALL*
+can be used. This macros works together with *XFY_TCALL_L*, but are 
+unaffected by *XFY_TCALL*. The last error is acessible over 
+*XFY_JNZ_VALUE* macro and can be returned by *XFY_TRET_JNZ*
+
+The chain macros are usefull if resources must by released explicitly.
+
+```C++
+int XFY_POM_is_object_a ( tag_t tObject, tag_t tClassID, logical *isA )
+{
+  XFY_TFCE_P3 ( tObject, I, tClassID, I, isA, O );
+
+  tag_t tObjectClass;
+  XFY_OK_TCALL ( POM_class_of_instance ( tObject, &tObjectClass ) );
+
+  XFY_OK_TCALL ( POM_is_descendant ( tClassID, tObjectClass, isA ) );
+  
+  XFY_TRET_JNZ;
+}
+```
 
 ### Multiple function call error handling
 
