@@ -74,8 +74,8 @@
 #define XFY_TCALL_V(X,V) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
 #define XFY_CALL_P(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET ( V ); }
 #define XFY_CALL_V(X,V) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return ( V ); }
-#define XFY_USE_JNZ
 #define XFY_JNZ_VALUE	cXFYTraceFce.m_retValue
+#define XFY_USE_JNZ
 
 #else
 #define XFY_TCALL(X) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) XFY_TRET_INT ( rc0O0O0O ); }
@@ -83,19 +83,31 @@
 #define XFY_TCALL_V(X,V) { int rc0O0O0O = XFY_TCALL_RET ( X ); if ( rc0O0O0O != 0 ) return ( V ); }
 #define XFY_CALL(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) XFY_TRET_INT ( rc0O0O0O ); }
 
-#define XFY_USE_JNZ		int xfyRetCode = ITK_ok;
 #define XFY_JNZ_VALUE	xfyRetCode
+#define XFY_USE_JNZ		int XFY_JNZ_VALUE = ITK_ok;
 #endif
+
+
 #define XFY_TCALL_N(X) { int rc0O0O0O = XFY_TREP ( X ); if ( rc0O0O0O != 0 ) return; }
 #define XFY_CALL_N(X) { int rc0O0O0O = X; if ( rc0O0O0O != 0 ) return; }
 
+
+// if last chain traced function was OK, call XFY chain traced function X 
+#define XFY_OK_CALL(X) { if ( XFY_JNZ_VALUE == ITK_ok ) XFY_JNZ_VALUE = X; }
+#define XFY_OK_TCALL(X) { if ( XFY_JNZ_VALUE == ITK_ok ) XFY_JNZ_VALUE = XFY_TREP ( X ); }
+
 // call ITK function X and go to label L on fail
-#define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_TREP ( X ); if ( XFY_JNZ_VALUE != 0 ) goto L; };
+#define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_TREP ( X ); if ( XFY_JNZ_VALUE != ITK_ok ) goto L; };
 // call XFY traced function X and go to label L on fail
-#define XFY_CALL_L(X,L) { XFY_JNZ_VALUE= X; if ( XFY_JNZ_VALUE != 0 ) goto L; }
-// return code of last XFY_CALL_L
+#define XFY_CALL_L(X,L) { XFY_JNZ_VALUE= X; if ( XFY_JNZ_VALUE != ITK_ok ) goto L; }
+// return code of last XFY_CALL_L/XFY_OK_CALL
 #define XFY_TRET_JNZ XFY_TRET(XFY_JNZ_VALUE)
-// return error code if last traced function failed
-#define XFY_TRET_NOK { if ( XFY_JNZ_VALUE != 0 ) XFY_TRET(XFY_JNZ_VALUE); }
+// return error code if last XFY_CALL_L/XFY_OK_CALL failed
+#define XFY_TRET_NOK { if ( XFY_JNZ_VALUE != ITK_ok ) XFY_TRET(XFY_JNZ_VALUE); }
+#define XFY_NOK_TRET { if ( XFY_JNZ_VALUE != ITK_ok ) XFY_TRET(XFY_JNZ_VALUE); }
+// go to label if last XFY_CALL_L/XFY_OK_CALL failed
+#define XFY_NOK_L(L) { if ( XFY_JNZ_VALUE != ITK_ok ) goto L; }
+// go to label if last XFY_CALL_L/XFY_OK_CALL suceeded
+#define XFY_OK_L(L) { if ( XFY_JNZ_VALUE == ITK_ok ) goto L; }
 
 #endif /* XFY_TRACE_ITK_H */
