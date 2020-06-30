@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <unidefs.h>
 #ifdef _WIN32
 #include <share.h>
 #endif
 
-#include <tc/tc.h>
 #include <mld/journal/journal.h>
 #include <tc/emh.h>
 
@@ -385,7 +385,7 @@ size_t XFY::Trace::transFileName(const char *pszFrom, char *pszTo,
 				break;
 			default:
 				fprintf(stderr,
-						"Unsupported Tracing Option *%c at position %d.\n",
+						"Unsupported Tracing Option *%c at position %td.\n",
 						*pszRunner, pszRunner - szBuf);
 				break;
 			}
@@ -802,7 +802,7 @@ TraceSimple( int, int, "%d", integer, (const int));
 TraceSimple( bool, bool, "%d", logical, (const logical));
 #endif
 TraceSimple( long, long, "%ld", nyi, &);
-TraceSimple( unsigned_short, unsigned short, "hu%", nyi, &);
+TraceSimple( unsigned_short, unsigned short, "%hu", nyi, &);
 // tag_t needs separate implementation of unsigned int
 // TraceSimple ( unsigned_int, unsigned int, "%u", nyi, & );
 TraceSimple( unsigned_long, unsigned long, "%lu", nyi, &);
@@ -1107,7 +1107,7 @@ void XFY::Trace::putVariable(const char *pszName, const char * const &value,
 		if (value == NULL) {
 			if (g_iOutMode & eOM_DEBUGING) {
 				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-						"%*s%s%s = %p (char *) len=undefined\n%*s  *%s = undefined\n",
+						"%*s%s%s = %p (char *) len=undefined\n%*s%s*%s = undefined\n",
 						XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT],
 						pszName, value, XFY::g_XFYTrace.getLevel(), "",
 						aszValuePrefix[eVT_EMPTY], pszName);
@@ -1120,7 +1120,7 @@ void XFY::Trace::putVariable(const char *pszName, const char * const &value,
 			if (g_iOutMode & eOM_DEBUGING) {
 				size_t stringLen = strlen ( value );
 				fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-						"%*s%s%s = %p (char *)\n%*s%s*%s = \"%.128s\"%s, len=%d\n",
+						"%*s%s%s = %p (char *)\n%*s%s*%s = \"%.128s\"%s, len=%zu\n",
 						XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT],
 						pszName, value, XFY::g_XFYTrace.getLevel(), "",
 						aszValuePrefix[eVT_EMPTY], pszName, value,
@@ -1223,7 +1223,7 @@ void XFY::Trace::putVariable(const char *pszName, const char ** const &value,
 					if (iDeep < 0) {
 						size_t stringLen = strlen(*pszArray);
 						fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-								"%*s%s**%s = \"%.128s\"%s, len=%d\n",
+								"%*s%s**%s = \"%.128s\"%s, len=%zu\n",
 								XFY::g_XFYTrace.getLevel() + 2, "",
 								aszValuePrefix[eVT_EMPTY], pszName, *pszArray,
 								stringLen > 128 ? "..." : "",
@@ -1237,7 +1237,7 @@ void XFY::Trace::putVariable(const char *pszName, const char ** const &value,
 										aszValuePrefix[eVT_EMPTY], pszName, iI);
 							} else {
 								fprintf((FILE*) XFY::g_XFYTrace.getOutputFile(),
-										"%*s%s*%s[%d] = \"%s\", len=%d\n",
+										"%*s%s*%s[%d] = \"%s\", len=%zu\n",
 										XFY::g_XFYTrace.getLevel() + 2, "",
 										aszValuePrefix[eVT_EMPTY], pszName, iI,
 										pszArray[iI], strlen(pszArray[iI]));
