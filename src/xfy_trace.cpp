@@ -802,7 +802,7 @@ TraceSimple( int, int, "%d", integer, (const int));
 TraceSimple( bool, bool, "%d", logical, (const logical));
 #endif
 TraceSimple( long, long, "%ld", nyi, &);
-TraceSimple( unsigned_short, unsigned short, "hu%", nyi, &);
+TraceSimple( unsigned_short, unsigned short, "%hu", nyi, &);
 // tag_t needs separate implementation of unsigned int
 // TraceSimple ( unsigned_int, unsigned int, "%u", nyi, & );
 TraceSimple( unsigned_long, unsigned long, "%lu", nyi, &);
