@@ -1,10 +1,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <unidefs.h>
 #ifdef _WIN32
-#include <share.h>
+	#include <share.h>
+#else
+	#include <limits.h>
 #endif
 
 #include <mld/journal/journal.h>
@@ -14,9 +17,26 @@
 
 // global object definition for tracing
 #ifdef XFYLIB
-__declspec(dllexport)
+	#   if defined(__lint)
+	#   elif defined(_WIN32)
+		__declspec(dllexport)
+	#else
+	#endif
 #endif
 XFY::Trace XFY::g_XFYTrace;
+
+#if defined (_WIN32)
+	#define LOCALTIME_IDPD	localtime_s
+	#define STRCPY_IDPD strcpy_s
+	#define STRNCPY_IDPD strncpy_s
+#else
+	#define LOCALTIME_IDPD(P1,P2)	memcpy (P1, localtime (P2),  sizeof ( struct tm ) );
+	#define STRCPY_IDPD(DEST,MAX,SRC) strcpy (DEST,SRC)
+	#define STRNCPY_IDPD(DEST,MAX,SRC,SIZE) strncpy (DEST,SRC,SIZE)
+	#define _countof(a) (sizeof(a)/sizeof(*(a)))
+	#define _MAX_PATH PATH_MAX
+#endif
+
 
 // Global Version ID string
 #define     XFY_TRACE_MAX_VERSION_ID 128
@@ -50,7 +70,7 @@ XFY::Trace::Trace() {
 	time_t actTime = time(NULL);
 	tm tmAct;
 
-	localtime_s(&tmAct, &actTime);
+	LOCALTIME_IDPD(&tmAct, &actTime);
 	strftime(m_szOutFile, _countof(m_szOutFile),
 			"xfy_itk_XFY_TRACE_%Y%m%d_%H%M%S.log", &tmAct);
 
@@ -68,47 +88,75 @@ XFY::Trace::Trace() {
 	m_iFceLevel = 0;
 
 // load environment for current settings
-	char *pszTraceFile;
+	char *pszTraceFile = NULL;
+	char *pszTraceFlags = NULL;
+	char *pszTraceFlush = NULL;
+	char *pszTraceFunction = NULL;
+
+#if defined (_WIN32)
 	size_t lTraceFile;
-	if ((_dupenv_s(&pszTraceFile, &lTraceFile, "XFY_TRACE_FILE") == 0)
-			&& (pszTraceFile != NULL)) {
+	if ((_dupenv_s(&pszTraceFile, &lTraceFile, "XFY_TRACE_FILE") == 0) &&
+#else
+	pszTraceFile = getenv ( "XFY_TRACE_FILE" );
+	if (
+#endif
+		 (pszTraceFile != NULL)) {
 		g_iOutMode |= eOM_DEBUGING;  // debugging activated
 
 		transFileName(pszTraceFile, m_szOutFile, _MAX_PATH, false);
-		free(pszTraceFile);
 	}
 
-	char *pszTraceFlags;
+#if defined (_WIN32)
 	size_t lTraceFlags;
-	if ((_dupenv_s(&pszTraceFlags, &lTraceFlags, "XFY_TRACE_FLAGS") == 0)
-			&& (pszTraceFlags != NULL)) {
+	if ((_dupenv_s(&pszTraceFlags, &lTraceFlags, "XFY_TRACE_FLAGS") == 0) &&
+#else
+	pszTraceFlags = getenv ("XFY_TRACE_FLAGS");
+	if (
+#endif
+			(pszTraceFlags != NULL)) {
 		m_iActFlag = atoi(pszTraceFlags);
-		free(pszTraceFlags);
 	}
 
-	char *pszTraceFlush;
+#if defined (_WIN32)
 	size_t lTraceFlush;
-	if ((_dupenv_s(&pszTraceFlush, &lTraceFlush, "XFY_TRACE_FLUSH") == 0)
-			&& (pszTraceFlush != NULL)) {
+	if ((_dupenv_s(&pszTraceFlush, &lTraceFlush, "XFY_TRACE_FLUSH") == 0) &&
+#else
+	pszTraceFlush = getenv ( "XFY_TRACE_FLUSH");
+	if (
+#endif
+			 (pszTraceFlush != NULL)) {
 		m_iUseFlush = atoi(pszTraceFlush);
 	}
 
-	char *pszTraceFunction;
+#if defined (_WIN32)
 	size_t lTraceFunction;
 	if ((_dupenv_s(&pszTraceFunction, &lTraceFunction, "XFY_TRACE_FUNCTION")
-			== 0) && (pszTraceFunction != NULL)) {
+			== 0) &&
+#else
+	pszTraceFunction = getenv ( "XFY_TRACE_FUNCTION" );
+	if (
+#endif
+			(pszTraceFunction != NULL)) {
 		m_iUseTraceFunction = true;
 		char *pszEqual = strrchr(pszTraceFunction, '=');
 		if (pszEqual == NULL) {
 			m_iTraceFunctionFlag = m_iActFlag;
-			strcpy_s(m_szTraceFunction, 255, pszTraceFunction);
+			STRCPY_IDPD(m_szTraceFunction, 255, pszTraceFunction);
 		} else {
 			m_iTraceFunctionFlag = atoi(pszEqual + 1);
-			strncpy_s(m_szTraceFunction, 255, pszTraceFunction,
+			STRNCPY_IDPD(m_szTraceFunction, 255, pszTraceFunction,
 					pszEqual - pszTraceFunction);
 			m_szTraceFunction[pszEqual - pszTraceFunction] = '\0';
 		}
 	}
+
+#if defined (_WIN32)
+	if ( pszTraceFile != NULL ) free (pszTraceFile);
+	if ( pszTraceFlags != NULL ) free(pszTraceFlags);
+	if ( pszTraceFlush != NULL ) free(pszTraceFlush);
+#else
+	// unix does not allocate memory by getenv
+#endif
 
 	if (m_iActFlag != 0 || m_iTraceFunctionFlag) {
 		printf("XFY Tracing activated on level %d into ", m_iActFlag);
@@ -160,10 +208,12 @@ void* XFY::Trace::getOutputFile() {
 		// try to open in read shared mode
 		m_pFile = _fsopen ( szWOutFile, "w", _SH_DENYWR );
 		if (m_pFile == NULL)
-#endif
 		{
 			if ((fopen_s((FILE**) &m_pFile, szWOutFile, "w") == 0)
-					&& (m_pFile == NULL))
+#else
+		{
+			if ((m_pFile = fopen( szWOutFile, "w") )== NULL)
+#endif
 			{
 				fprintf(stderr,
 						"Error: Trace File %s not opened. Standart output is used.",
@@ -189,7 +239,7 @@ void XFY::Trace::putFileBreak() {
 		char szTime[80];
 		time_t tNow = time(NULL);
 		tm tmNow;
-		localtime_s(&tmNow, &tNow);
+		LOCALTIME_IDPD(&tmNow, &tNow);
 		strftime(szTime, sizeof(szTime) - 1, "%Y-%m-%d %H:%M:%S", &tmNow);
 		fprintf((FILE*) m_pFile,
 				"*******************************************************\n"
@@ -318,7 +368,7 @@ size_t XFY::Trace::transFileName(const char *pszFrom, char *pszTo,
 	char szBuf[1024];
 	char *pszSaver = pszTo;
 
-	strncpy_s(szBuf, _countof(szBuf), pszFrom, 1023); // avoid problems with self-translation
+	STRNCPY_IDPD( szBuf, _countof(szBuf), pszFrom, 1023); // avoid problems with self-translation
 	const char *pszRunner = szBuf;
 
 	if (pszFrom == pszTo) {
@@ -332,7 +382,7 @@ size_t XFY::Trace::transFileName(const char *pszFrom, char *pszTo,
 			case 'D': {
 				time_t actTime = time(NULL);
 				tm tmAct;
-				localtime_s(&tmAct, &actTime);
+				LOCALTIME_IDPD(&tmAct, &actTime);
 				if (strftime(pszSaver, iFreeSpace, "%Y%m%d_%H%M%S", &tmAct) > 0)
 					pszSaver += strlen(pszSaver);
 			}
@@ -342,7 +392,7 @@ size_t XFY::Trace::transFileName(const char *pszFrom, char *pszTo,
 
 				size_t iAddLen = strlen(szProgEnv);
 				if (iAddLen < iFreeSpace) {
-					strcpy_s(pszSaver, iFreeSpace, szProgEnv);
+					STRCPY_IDPD(pszSaver, iFreeSpace, szProgEnv);
 					pszSaver += iAddLen;
 				}
 			}
@@ -362,8 +412,9 @@ size_t XFY::Trace::transFileName(const char *pszFrom, char *pszTo,
 				if (isTransAll) {
 					if ((m_szAppName != NULL)
 							&& ((int) strlen(m_szAppName) < iFreeSpace)) {
-						pszSaver += sprintf_s(pszSaver, iFreeSpace, "%s",
-								m_szAppName);
+						pszSaver +=
+								snprintf(pszSaver,iFreeSpace, "%s",
+										m_szAppName);
 					}
 				} else {
 					if (iFreeSpace > 2) {
@@ -635,8 +686,13 @@ int XFY::Trace::reportFceCall(const char *ufName, const char *fileName,
 		// error occurred
 		time_t t = time(0); // obtain the current time_t value
 		tm now;
-		if ((localtime_s(&now, &t) != 0)
-				|| (strftime(tmdescr, sizeof(tmdescr) - 1, ", at %H:%M:%S",
+#if defined (_WIN32)
+		if ((LOCALTIME_IDPD(&now, &t) != 0) ||
+#else
+		LOCALTIME_IDPD(&now,&t);
+		if (
+#endif
+				(strftime(tmdescr, sizeof(tmdescr) - 1, ", at %H:%M:%S",
 						&now) <= 0)) {
 			// error occurred, empty string
 			*tmdescr = 0;
@@ -764,6 +820,7 @@ const int XFY::Trace::getOutMode() const {
 // Changes : 
 // Date        By      Reason
 //-----------------------------------------------------------------------
+#ifdef XXX
 #define DO_JOURNALING(mode,jourtype,jourpref) \
   if ( mode & XFY::Trace::eOM_JOURNALING ) switch ( eVT ) \
     { case eVT_IO : case eVT_ION :JOURNAL_output_argument ( pszName ); \
@@ -780,7 +837,7 @@ void XFY::Trace::putVariable ( const char *pszName, const partype &value, eVALUE
 { DO_JOURNALING (XFY::g_XFYTrace.getOutMode(),##jourtype, ##jourpref); \
   if ( eVT != eVT_O && eVT != eVT_ON ) { \
     if ( XFY::g_XFYTrace.getOutMode() & XFY::Trace::eOM_DEBUGING ) {\
-      fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = "parformat" ("#partype")\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value ); }\
+      fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = " parformat " (" #partype ")\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value ); }\
     } \
   if ( eVT == eVT_O || eVT == eVT_ON || eVT == eVT_IO || eVT == eVT_ION ) \
     pOutItem->registerOutputParam ( pszName, (void *)(&value), (TRACEVALUE)TraceVal_##fcename ); } \
@@ -789,12 +846,45 @@ static void TraceVal_p_##fcename ( const char *pszName, const partype **value, i
 void XFY::Trace::putVariable ( const char *pszName, const partype *const &value, eVALUE_TYPE eVT, XFY::TraceFce *pOutItem, int iDeep ) \
 { if ( eVT != eVT_O && eVT != eVT_ON ) {\
     if ( XFY::g_XFYTrace.getOutMode() & XFY::Trace::eOM_DEBUGING ) {\
-      if ( value == NULL ) fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = %p ("#partype" *)   *%s = undefined\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value, pszName); \
-      else fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = %p ("#partype" *)   *%s = "parformat"\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value, pszName, *value ); \
+      if ( value == NULL ) fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = %p (" #partype " *)   *%s = undefined\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value, pszName); \
+      else fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = %p (" #partype " *)   *%s = " parformat "\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value, pszName, *value ); \
    }}\
   if ( eVT == eVT_O || eVT == eVT_ON || eVT == eVT_IO || eVT == eVT_ION ) \
     pOutItem->registerOutputParam ( pszName, (void **)&(value), (TRACEVALUE)TraceVal_p_##fcename );\
 }; 
+#endif
+
+#define DO_JOURNALING(mode,jourtype,jourpref) \
+  if ( mode & XFY::Trace::eOM_JOURNALING ) switch ( eVT ) \
+    { case eVT_IO : case eVT_ION :JOURNAL_output_argument ( pszName ); \
+      case eVT_I : case eVT_IN : JOURNAL_##jourtype##_in ( jourpref value ); break; \
+      case eVT_O : case eVT_ON : JOURNAL_##jourtype##_out ( pszName, jourpref value ); break; \
+      default :;  }
+
+#define TraceSimple(fcename,partype,parformat,jourtype,jourpref) \
+static void TraceVal_##fcename (const char *pszName, const partype *value, int iDeep ) \
+{/*  if ( XFY::g_XFYTrace.getOutMode() & XFY::Trace::eOM_DEBUGING ) */{\
+     XFY::Trace::putVariable ( pszName, *value, XFY::Trace::eVT_O_RET ); } \
+} \
+void XFY::Trace::putVariable ( const char *pszName, const partype &value, eVALUE_TYPE eVT, XFY::TraceFce *pOutItem ) \
+{ /*DO_JOURNALING (XFY::g_XFYTrace.getOutMode(),##jourtype, ##jourpref); */\
+  if ( eVT != eVT_O && eVT != eVT_ON ) { \
+    if ( XFY::g_XFYTrace.getOutMode() & XFY::Trace::eOM_DEBUGING ) {\
+      fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = " parformat " (" #partype ")\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value ); }\
+    } \
+  if ( eVT == eVT_O || eVT == eVT_ON || eVT == eVT_IO || eVT == eVT_ION ) \
+    pOutItem->registerOutputParam ( pszName, (void *)(&value), (TRACEVALUE)TraceVal_##fcename ); } \
+static void TraceVal_p_##fcename ( const char *pszName, const partype **value, int iDeep ) \
+{ XFY::Trace::putVariable ( pszName, *value, XFY::Trace::eVT_O_RET ); } \
+void XFY::Trace::putVariable ( const char *pszName, const partype *const &value, eVALUE_TYPE eVT, XFY::TraceFce *pOutItem, int iDeep ) \
+{ if ( eVT != eVT_O && eVT != eVT_ON ) {\
+    if ( XFY::g_XFYTrace.getOutMode() & XFY::Trace::eOM_DEBUGING ) {\
+      if ( value == NULL ) fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = %p (" #partype " *)   *%s = undefined\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value, pszName); \
+      else fprintf ( (FILE*)XFY::g_XFYTrace.getOutputFile(), "%*s%s%s = %p (" #partype " *)   *%s = " parformat "\n", XFY::g_XFYTrace.getLevel(), "", aszValuePrefix[eVT], pszName, value, pszName, *value ); \
+   }}\
+  if ( eVT == eVT_O || eVT == eVT_ON || eVT == eVT_IO || eVT == eVT_ION ) \
+    pOutItem->registerOutputParam ( pszName, (void **)&(value), (TRACEVALUE)TraceVal_p_##fcename );\
+};
 
 TraceSimple( short, short, "%hd", nyi, &);
 TraceSimple( int, int, "%d", integer, (const int));

@@ -95,6 +95,7 @@
 // if last chain traced function was OK, call XFY chain traced function X 
 #define XFY_OK_CALL(X) { if ( XFY_JNZ_VALUE == ITK_ok ) XFY_JNZ_VALUE = X; }
 #define XFY_OK_TCALL(X) { if ( XFY_JNZ_VALUE == ITK_ok ) XFY_JNZ_VALUE = XFY_TREP ( X ); }
+#define XFY_OK_CALL_V(X) { if ( XFY_JNZ_VALUE == ITK_ok ) {X;} }
 
 // call ITK function X and go to label L on fail
 #define XFY_TCALL_L(X,L) { XFY_JNZ_VALUE = XFY_TREP ( X ); if ( XFY_JNZ_VALUE != ITK_ok ) goto L; };

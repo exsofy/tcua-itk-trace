@@ -7,15 +7,26 @@
 #ifdef __cplusplus
 
 #ifdef XFYUSELIB
-#ifdef XFYLIB
-#define XFY_API __declspec(dllexport)
+	#ifdef XFYLIB
+		#if defined(__lint)
+			#define XFY_API  __export(Avf2foundation)
+		#elif defined(_WIN32)
+			#define XFY_API __declspec(dllexport)
+		#else
+			#define XFY_API
+		#endif
+	#else
+		#if defined(__lint)
+			#define XFY_API  __export(Avf2foundation)
+		#elif defined(_WIN32)
+			#define XFY_API __declspec(dllimport)
+		#else
+			#define XFY_API
+		#endif
+	#endif
 #else
-#define XFY_API __declspec(dllimport)
+	#define XFY_API
 #endif
-#else
-#define XFY_API
-#endif
-
 
 namespace XFY {
 
