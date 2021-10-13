@@ -209,7 +209,7 @@ void* XFY::Trace::getOutputFile() {
 		m_pFile = _fsopen ( szWOutFile, "w", _SH_DENYWR );
 		if (m_pFile == NULL)
 		{
-			if ((fopen_s((FILE**) &m_pFile, szWOutFile, "w") == 0)
+			if ( fopen_s((FILE**) &m_pFile, szWOutFile, "w") == 0)
 #else
 		{
 			if ((m_pFile = fopen( szWOutFile, "w") )== NULL)
