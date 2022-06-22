@@ -36,25 +36,25 @@
 #endif
 #endif
 
-#define XFY_TMSG XFY::g_XFYTrace.putMessage
-#define XFY_TRET(RetValue) return (XFY::g_XFYTrace.putFceReturns(RetValue,&cXFYTraceFce,__LINE__))
-#define XFY_TERR(RetValue) return(XFY::g_XFYTrace.putErrorReturns(RetValue,&cXFYTraceFce,__LINE__))
-#define XFY_TRET_OK return (XFY::g_XFYTrace.putFceReturns(ITK_ok,&cXFYTraceFce,__LINE__))
+#define XFY_TMSG XFYNAMESPACE::g_XFYTrace.putMessage
+#define XFY_TRET(RetValue) return (XFYNAMESPACE::g_XFYTrace.putFceReturns(RetValue,&cXFYTraceFce,__LINE__))
+#define XFY_TERR(RetValue) return(XFYNAMESPACE::g_XFYTrace.putErrorReturns(RetValue,&cXFYTraceFce,__LINE__))
+#define XFY_TRET_OK return (XFYNAMESPACE::g_XFYTrace.putFceReturns(ITK_ok,&cXFYTraceFce,__LINE__))
 
-#define XFY_TPAR_REPORT(P,T) XFY::g_XFYTrace.putVariable(#P,P,XFY::Trace::eVT_##T,&cXFYTraceFce)
-#define XFY_TPAR(P1,T1) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); }
-#define XFY_TPAR_0() if ( XFY::g_XFYTrace.showParam() ) { XFY::g_XFYTrace.finishFunctionHeader(); }
-#define XFY_TPAR_1(P1,T1) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY::g_XFYTrace.finishFunctionHeader(); }
-#define XFY_TPAR_2(P1,T1,P2,T2) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY::g_XFYTrace.finishFunctionHeader();}
-#define XFY_TPAR_3(P1,T1,P2,T2,P3,T3) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); XFY::g_XFYTrace.finishFunctionHeader();}
-#define XFY_TPAR_4(P1,T1,P2,T2,P3,T3,P4,T4) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3);  XFY_TPAR_REPORT(P4,T4); XFY::g_XFYTrace.finishFunctionHeader();}
-#define XFY_TPAR_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); \
-                                                                                      XFY_TPAR_REPORT(P4,T4); XFY_TPAR_REPORT(P5,T5); XFY::g_XFYTrace.finishFunctionHeader();}
-#define XFY_TPAR_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) if ( XFY::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); \
-                                                                                      XFY_TPAR_REPORT(P4,T4); XFY_TPAR_REPORT(P5,T5); XFY_TPAR_REPORT(P6,T6); XFY::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_REPORT(P,T) XFYNAMESPACE::g_XFYTrace.putVariable(#P,P,XFYNAMESPACE::Trace::eVT_##T,&cXFYTraceFce)
+#define XFY_TPAR(P1,T1) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); }
+#define XFY_TPAR_0() if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFYNAMESPACE::g_XFYTrace.finishFunctionHeader(); }
+#define XFY_TPAR_1(P1,T1) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFYNAMESPACE::g_XFYTrace.finishFunctionHeader(); }
+#define XFY_TPAR_2(P1,T1,P2,T2) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFYNAMESPACE::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_3(P1,T1,P2,T2,P3,T3) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); XFYNAMESPACE::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_4(P1,T1,P2,T2,P3,T3,P4,T4) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3);  XFY_TPAR_REPORT(P4,T4); XFYNAMESPACE::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); \
+                                                                                      XFY_TPAR_REPORT(P4,T4); XFY_TPAR_REPORT(P5,T5); XFYNAMESPACE::g_XFYTrace.finishFunctionHeader();}
+#define XFY_TPAR_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) if ( XFYNAMESPACE::g_XFYTrace.showParam() ) { XFY_TPAR_REPORT(P1,T1); XFY_TPAR_REPORT(P2,T2); XFY_TPAR_REPORT(P3,T3); \
+                                                                                      XFY_TPAR_REPORT(P4,T4); XFY_TPAR_REPORT(P5,T5); XFY_TPAR_REPORT(P6,T6); XFYNAMESPACE::g_XFYTrace.finishFunctionHeader();}
 
-#define XFY_TFCE XFY::TraceFce cXFYTraceFce(__func__)
-#define XFY_TFCE_NAME(X) XFY::TraceFce cXFYTraceFce(#X)
+#define XFY_TFCE XFYNAMESPACE::TraceFce cXFYTraceFce(__func__)
+#define XFY_TFCE_NAME(X) XFYNAMESPACE::TraceFce cXFYTraceFce(#X)
 #define XFY_TFCE_P0() XFY_TFCE; XFY_TPAR_0();
 #define XFY_TFCE_P1(P1,T1) XFY_TFCE; XFY_TPAR_1(P1,T1)
 #define XFY_TFCE_P2(P1,T1,P2,T2) XFY_TFCE; XFY_TPAR_2(P1,T1,P2,T2)
@@ -63,7 +63,7 @@
 #define XFY_TFCE_P5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5) XFY_TFCE; XFY_TPAR_5(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5)
 #define XFY_TFCE_P6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6) XFY_TFCE; XFY_TPAR_6(P1,T1,P2,T2,P3,T3,P4,T4,P5,T5,P6,T6)
 
-#define XFY_TREP(X) (XFY::g_XFYTrace.reportFceCall(#X, __FILE__, __LINE__, (X)))
+#define XFY_TREP(X) (XFYNAMESPACE::g_XFYTrace.reportFceCall(#X, __FILE__, __LINE__, (X)))
 #endif
 
 // Independent calls, used by trace and notrace
